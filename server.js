@@ -5,6 +5,7 @@ const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const expenseRoutes = require("./routes/expenseRoutes");
 const path = require("path");
+const fs = require("fs");
 
 dotenv.config();
 
@@ -14,12 +15,18 @@ connectDB();
 const app = express();
 const PORT = process.env.PORT || 5002;
 
+// Ensure the "uploads" folder exists
+const uploadDir = path.join(__dirname, "uploads");
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir);
+}
+
 // Middleware
 app.use(cors());
 app.use(express.json());
 
 // Serve static files (uploaded receipts)
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/uploads", express.static(uploadDir));
 
 // Routes
 app.use("/api/auth", authRoutes);
