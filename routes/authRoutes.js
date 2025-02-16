@@ -2,6 +2,8 @@ const express = require("express");
 const bcrypt = require("bcryptjs"); // Make sure it's bcryptjs, not bcrypt
 const User = require("../models/User"); // Ensure correct path to User model
 const router = express.Router();
+const jwt = require("jsonwebtoken");
+
 // Register
 router.post("/register", async (req, res) => {
   try {
