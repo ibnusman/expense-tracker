@@ -2,7 +2,19 @@ const Expense = require("../models/Expense");
 
 exports.getExpenses = async (req, res) => {
   try {
-    const expenses = await Expense.find({ user: req.userId });
+    const { category, minAmount, maxAmount, sortBy, search } = req.query;
+
+    let filter = { user: req.userId };
+
+    if (category) filter.category = category;
+    if (minAmount) filter.amount = { ...filter.amount, $gte: parseFloat(minAmount) };
+    if (maxAmount) filter.amount = { ...filter.amount, $lte: parseFloat(maxAmount) };
+    if (search) filter.description = { $regex: search, $options: "i" };
+
+    let sortOption = {};
+    if (sortBy) sortOption[sortBy] = 1; // Sort ascending by default
+
+    const expenses = await Expense.find(filter).sort(sortOption);
     res.json(expenses);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -10,13 +22,18 @@ exports.getExpenses = async (req, res) => {
 };
 
 exports.createExpense = async (req, res) => {
-  const expense = new Expense({
-    description: req.body.description,
-    amount: req.body.amount,
-    category: req.body.category,
-    user: req.userId,
-  });
   try {
+    const { description, amount, category } = req.body;
+    const receiptUrl = req.file ? `/uploads/${req.file.filename}` : null; // Save file path
+
+    const expense = new Expense({
+      description,
+      amount,
+      category,
+      user: req.userId,
+      receipt: receiptUrl,
+    });
+
     const newExpense = await expense.save();
     res.status(201).json(newExpense);
   } catch (err) {
