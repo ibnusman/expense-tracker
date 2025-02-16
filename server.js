@@ -5,7 +5,7 @@ const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const expenseRoutes = require("./routes/expenseRoutes");
 const path = require("path");
-const authRoutes = require("./routes/auth");
+
 
 dotenv.config();
 const app = express();
